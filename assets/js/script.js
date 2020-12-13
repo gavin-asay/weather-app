@@ -1,4 +1,5 @@
 const weatherDisplay = {
+  cityNameEl: document.querySelector("#city-name"),
   tempTodayEl: document.querySelector("#temp-today span"),
   humidityTodayEl: document.querySelector("#humidity-today span"),
   windTodayEl: document.querySelector("#wind-today span"),
@@ -14,10 +15,13 @@ function getTodayWeather() {
       response
         .json()
         .then(function (data) {
-          var weatherToday = {
+          let weatherToday = {
+            city: data.name,
             temp: data.main.temp,
             humidity: data.main.humidity,
             wind: data.wind.speed,
+            icon: data.weather[0].icon,
+            desc: data.weather[0].description,
           };
 
           let location = {
@@ -25,6 +29,12 @@ function getTodayWeather() {
             lat: data.coord.lat,
           };
 
+          weatherDisplay.cityNameEl.innerHTML =
+            weatherToday.city +
+            "<img src='https://openweathermap.org/img/wn/" +
+            weatherToday.icon +
+            "@2x.png' alt='' />" +
+            weatherToday.desc;
           weatherDisplay.tempTodayEl.textContent = weatherToday.temp;
           weatherDisplay.humidityTodayEl.textContent = weatherToday.humidity;
           weatherDisplay.windTodayEl.textContent = weatherToday.wind;

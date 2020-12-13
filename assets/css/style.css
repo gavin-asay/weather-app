@@ -36,3 +36,9 @@ input {
     border: 1px solid gray;
     padding: 3px;
 }
+
+#today-weather img {
+    display: inline-block;
+    height: 3em;
+    padding: 0 0.5em 0 0.5em;
+}
