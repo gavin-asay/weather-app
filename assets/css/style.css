@@ -1,5 +1,9 @@
 input {
-    max-width: 80%;
+    max-width: 75%;
+}
+
+form div {
+    width: fit-content;
 }
 
 .btn {
