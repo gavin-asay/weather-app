@@ -142,7 +142,9 @@ function setPreviousSearch() {
     previousSearches.splice(10, 1);
   }
 
-  localStorage.setItem("previous", JSON.stringify(previousSearches));
+  // thanks https://www.javascripttutorial.net/array/javascript-remove-duplicates-from-array/ for this trick to remove duplicates from array
+  let noDupeSearch = [...new Set(previousSearches)];
+  localStorage.setItem("previous", JSON.stringify(noDupeSearch));
 
   renderPreviousSearch();
 }
@@ -159,6 +161,7 @@ function previousSearchHandler(event) {
   searchBarEl.value = event.target.textContent;
   searchTerm = event.target.textContent;
   getTodayWeather();
+  setPreviousSearch();
 }
 
 if (JSON.parse(localStorage.getItem("previous"))) {
