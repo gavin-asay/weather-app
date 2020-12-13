@@ -1,3 +1,38 @@
 input {
     max-width: 100%;
 }
+
+.uv-low {
+    background-color: green;
+    border-radius: 3px;
+    border: 1px solid gray;
+    padding: 3px;
+}
+
+.uv-moderate {
+    background-color: yellow;
+    border-radius: 6px;
+    border: 1px solid gray;
+    padding: 5px;
+}
+
+.uv-high {
+    background-color: orange;
+    border-radius: 3px;
+    border: 1px solid gray;
+    padding: 3px;
+}
+
+.uv-veryhigh {
+    background-color: red;
+    border-radius: 3px;
+    border: 1px solid gray;
+    padding: 3px;
+}
+
+.uv-extreme {
+    background-color: purple;
+    border-radius: 3px;
+    border: 1px solid gray;
+    padding: 3px;
+}

@@ -1,4 +1,4 @@
-let weatherDisplay = {
+const weatherDisplay = {
   tempTodayEl: document.querySelector("#temp-today span"),
   humidityTodayEl: document.querySelector("#humidity-today span"),
   windTodayEl: document.querySelector("#wind-today span"),
@@ -7,21 +7,60 @@ let weatherDisplay = {
 
 function getTodayWeather() {
   let apiUrl =
-    "https://api.openweathermap.org/data/2.5/weather?q=Provo&units=imperial&appid=db286021ea7c4b451e838035ab9b35d0";
+    "https://api.openweathermap.org/data/2.5/weather?q=Escondido&units=imperial&appid=db286021ea7c4b451e838035ab9b35d0";
 
   fetch(apiUrl).then(function (response) {
     if (response.ok) {
-      response.json().then(function (data) {
-        let weatherToday = {
-          temp: data.main.temp,
-          humidity: data.main.humidity,
-          wind: data.wind.speed,
-        };
+      response
+        .json()
+        .then(function (data) {
+          var weatherToday = {
+            temp: data.main.temp,
+            humidity: data.main.humidity,
+            wind: data.wind.speed,
+          };
 
-        weatherDisplay.tempTodayEl.textContent = weatherToday.temp;
-        weatherDisplay.humidityTodayEl.textContent = weatherToday.humidity;
-        weatherDisplay.windTodayEl.textContent = weatherToday.wind;
-      });
+          let location = {
+            lon: data.coord.lon,
+            lat: data.coord.lat,
+          };
+
+          weatherDisplay.tempTodayEl.textContent = weatherToday.temp;
+          weatherDisplay.humidityTodayEl.textContent = weatherToday.humidity;
+          weatherDisplay.windTodayEl.textContent = weatherToday.wind;
+
+          let apiUv =
+            "http://api.openweathermap.org/data/2.5/uvi?lat=" +
+            location.lat +
+            "&lon=" +
+            location.lon +
+            "&appid=db286021ea7c4b451e838035ab9b35d0";
+
+          return fetch(apiUv);
+        })
+        .then(function (response) {
+          response.json().then(function (data) {
+            weatherDisplay.uvTodayEl.textContent = data.value;
+
+            switch (true) {
+              case data.value <= 2:
+                weatherDisplay.uvTodayEl.classList = "uv-low";
+                break;
+              case data.value <= 5:
+                weatherDisplay.uvTodayEl.classList = "uv-moderate";
+                break;
+              case data.value <= 7:
+                weatherDisplay.uvTodayEl.classList = "uv-high";
+                break;
+              case data.value < 11:
+                weatherDisplay.uvTodayEl.classList = "uv-veryhigh";
+                break;
+              case data.value >= 11:
+                weatherDisplay.uvTodayEl.classList = "uv-high";
+                break;
+            }
+          });
+        });
     } else {
       console.log(response.statusText);
     }
