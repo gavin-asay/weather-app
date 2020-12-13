@@ -1,4 +1,5 @@
 const weatherDisplay = {
+  todayDateEl: document.querySelector("#today-date"),
   cityNameEl: document.querySelector("#city-name"),
   tempTodayEl: document.querySelector("#temp-today span"),
   humidityTodayEl: document.querySelector("#humidity-today span"),
@@ -6,9 +7,20 @@ const weatherDisplay = {
   uvTodayEl: document.querySelector("#uv-today span"),
 };
 
+let searchBarEl = document.querySelector("#search");
+let searchTerm = "";
+let previousSearches = [];
+let previousContainerEl = document.querySelector("#previous-searches");
+
+let locate = {};
+
+weatherDisplay.todayDateEl.textContent = dayjs().format("dddd, MMMM DD, YYYY");
+
 function getTodayWeather() {
   let apiUrl =
-    "https://api.openweathermap.org/data/2.5/weather?q=Escondido&units=imperial&appid=db286021ea7c4b451e838035ab9b35d0";
+    "https://api.openweathermap.org/data/2.5/weather?q=" +
+    searchTerm +
+    "&units=imperial&appid=db286021ea7c4b451e838035ab9b35d0";
 
   fetch(apiUrl).then(function (response) {
     if (response.ok) {
@@ -24,10 +36,8 @@ function getTodayWeather() {
             desc: data.weather[0].description,
           };
 
-          let location = {
-            lon: data.coord.lon,
-            lat: data.coord.lat,
-          };
+          locate.lon = data.coord.lon;
+          locate.lat = data.coord.lat;
 
           weatherDisplay.cityNameEl.innerHTML =
             weatherToday.city +
@@ -41,9 +51,9 @@ function getTodayWeather() {
 
           let apiUv =
             "http://api.openweathermap.org/data/2.5/uvi?lat=" +
-            location.lat +
+            locate.lat +
             "&lon=" +
-            location.lon +
+            locate.lon +
             "&appid=db286021ea7c4b451e838035ab9b35d0";
 
           return fetch(apiUv);
@@ -66,15 +76,84 @@ function getTodayWeather() {
                 weatherDisplay.uvTodayEl.classList = "uv-veryhigh";
                 break;
               case data.value >= 11:
-                weatherDisplay.uvTodayEl.classList = "uv-high";
+                weatherDisplay.uvTodayEl.classList = "uv-extreme";
                 break;
             }
           });
-        });
+          console.log(locate.lat, locate.lon);
+          let forecastUrl =
+            "https://api.openweathermap.org/data/2.5/onecall?lat=" +
+            locate.lat +
+            "&lon=" +
+            locate.lon +
+            "&exclude=current,minutely,hourly,alerts&units=imperial&appid=db286021ea7c4b451e838035ab9b35d0";
+
+          return fetch(forecastUrl);
+        })
+        .then(getForecast);
+    } else if (response.statusText === "Not Found") {
+      weatherDisplay.cityNameEl.textContent =
+        "City name not found. Please try again.";
+      weatherDisplay.tempTodayEl.textContent = "";
+      weatherDisplay.humidityTodayEl.textContent = "";
+      weatherDisplay.windTodayEl.textContent = "";
     } else {
       console.log(response.statusText);
     }
   });
 }
 
-getTodayWeather();
+function getForecast(response) {
+  if (response.ok) {
+    response.json().then(function (data) {
+      for (let i = 1; i < 6; i++) {
+        document.querySelector("#date-" + i).innerHTML =
+          dayjs.unix(data.daily[i].dt).format("dd, MMM DD") +
+          "<img src='https://openweathermap.org/img/wn/" +
+          data.daily[i].weather[0].icon +
+          "@2x.png' alt='' />";
+
+        document.querySelector("#temp-" + i + " span").textContent =
+          data.daily[i].temp.day;
+
+        document.querySelector("#humidity-" + i + " span").textContent =
+          data.daily[i].humidity;
+      }
+    });
+  }
+}
+
+function renderPreviousSearch() {
+  previousContainerEl.innerHTML = "";
+  previousSearches = JSON.parse(localStorage.getItem("previous"));
+
+  previousSearches.forEach(function (search) {
+    let newButton = document.createElement("button");
+    newButton.classList = "btn btn-light w-100 p-2";
+    newButton.textContent = search;
+    previousContainerEl.appendChild(newButton);
+  });
+}
+
+function setPreviousSearch() {
+  previousSearches.unshift(searchTerm);
+
+  while (previousSearches.length > 10) {
+    previousSearches.splice(10, 1);
+  }
+  localStorage.setItem("previous", JSON.stringify(previousSearches));
+
+  renderPreviousSearch();
+}
+
+function searchHandler(event) {
+  event.preventDefault();
+  searchTerm = searchBarEl.value;
+  getTodayWeather();
+  setPreviousSearch();
+}
+
+if (JSON.parse(localStorage.getItem("previous"))) {
+  renderPreviousSearch();
+}
+document.querySelector("#find").addEventListener("submit", searchHandler);

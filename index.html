@@ -8,23 +8,29 @@
     <title>Weather App</title>
 </head>
 <body>
-    <div class="container vh-100">
-        <row class="d-flex h-100">
-            <header class="col-12 col-md-6 col-lg-3 bg-warning h-100">
+    <div class="container">
+        <row class="d-flex flex-wrap h-100">
+            <header class="col-12 col-md-6 col-lg-3 bg-warning">
                 <h1 class="text-white">Weather App</h1>
                 <nav class="text-white">
                     <form id="find">
                         <label for="search">Search for a city:</label>
-                        <input type="text" name="search" id="search" />
+                        <div class="d-flex flex-nowrap align-content-center">
+                            <input type="text" name="search" id="search" />
+                            <button type="submit" class="btn btn-primary">🔍</button>
+                        </div>
                     </form>
                     <h2>Previously searched cities:</h2>
+                    <div id="previous-searches">
+                        
+                    </div>
                 </nav>
             </header>
             <section class="col-12 col-md-6 col-lg-9 mt-2">
                 <article id="today-weather" class="card border">
                     <div class="card-header">
-                        <h2 class="card-title">Today's Weather</h2>
-                        <h3 class="card-subtitle">December 12, 2020</h3>
+                        <h2 class="card-title">Current Weather</h2>
+                        <h3 class="card-subtitle" id="today-date"></h3>
                     </div>
                     <div class="card-body">
                         <h4 id="city-name">Search for a city</h4>
@@ -34,22 +40,43 @@
                         <p id="uv-today">UV Index: <span></span></p>
                     </div>
                 </article>
-                <article id="today-weather" class="card border">
+                <article id="forecast" class="card border">
                     <div class="card-header">
                         <h2 class="card-title">Five-Day Forecast</h2>
                     </div>
                     <div class="card-body d-flex flex-wrap justify-content-center">
-                        <div id="forecast-1" class="bg-primary text-white p-2 m-2">Temperature: 70 &#8457;</div>
-                        <div id="forecast-2" class="bg-primary text-white p-2 m-2">Temperature: 70 &#8457;</div>
-                        <div id="forecast-3" class="bg-primary text-white p-2 m-2">Temperature: 70 &#8457;</div>
-                        <div id="forecast-4" class="bg-primary text-white p-2 m-2">Temperature: 70 &#8457;</div>
-                        <div id="forecast-5" class="bg-primary text-white p-2 m-2">Temperature: 70 &#8457;</div>
+                        <div id="forecast-1" class="bg-primary text-white p-2 m-2 forecast-card">
+                            <h3 class="card-title" id="date-1"></h3>
+                            <p id="temp-1">Temperature: <span></span> &#8457;</p>
+                            <p id="humidity-1">Humidity: <span></span>%</p>
+                        </div>
+                        <div id="forecast-2" class="bg-primary text-white p-2 m-2 forecast-card">
+                            <h3 class="card-title" id="date-2"></h3>
+                            <p id="temp-2">Temperature: <span></span> &#8457;</p>
+                            <p id="humidity-2">Humidity: <span></span>%</p>
+                        </div>
+                        <div id="forecast-3" class="bg-primary text-white p-2 m-2 forecast-card">
+                            <h3 class="card-title" id="date-3"></h3>
+                            <p id="temp-3">Temperature: <span></span> &#8457;</p>
+                            <p id="humidity-3">Humidity: <span></span>%</p>
+                        </div>
+                        <div id="forecast-4" class="bg-primary text-white p-2 m-2 forecast-card">
+                            <h3 class="card-title" id="date-4"></h3>
+                            <p id="temp-4">Temperature: <span></span> &#8457;</p>
+                            <p id="humidity-4">Humidity: <span></span>%</p>
+                        </div>
+                        <div id="forecast-5" class="bg-primary text-white p-2 m-2 forecast-card">
+                            <h3 class="card-title" id="date-5"></h3>
+                            <p id="temp-5">Temperature: <span></span> &#8457;</p>
+                            <p id="humidity-5">Humidity: <span></span>%</p>
+                        </div>
                     </div>
                 </article>
             </section>
 
         </row>
     </div>
-    <script src="./assets/js/script.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.9.6/dayjs.min.js" integrity="sha512-C2m821NxMpJ4Df47O4P/17VPqt0yiK10UmGl59/e5ynRRYiCSBvy0KHJjhp2XIjUJreuR+y3SIhVyiVilhCmcQ==" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="./assets/js/script.js"></script>
 </body>
 </html>
