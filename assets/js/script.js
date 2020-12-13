@@ -141,6 +141,7 @@ function setPreviousSearch() {
   while (previousSearches.length > 10) {
     previousSearches.splice(10, 1);
   }
+
   localStorage.setItem("previous", JSON.stringify(previousSearches));
 
   renderPreviousSearch();
@@ -153,7 +154,15 @@ function searchHandler(event) {
   setPreviousSearch();
 }
 
+function previousSearchHandler(event) {
+  event.preventDefault();
+  searchBarEl.value = event.target.textContent;
+  searchTerm = event.target.textContent;
+  getTodayWeather();
+}
+
 if (JSON.parse(localStorage.getItem("previous"))) {
   renderPreviousSearch();
 }
 document.querySelector("#find").addEventListener("submit", searchHandler);
+previousContainerEl.addEventListener("click", previousSearchHandler);
