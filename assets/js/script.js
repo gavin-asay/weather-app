@@ -13,10 +13,11 @@ let previousSearches = [];
 let previousContainerEl = document.querySelector("#previous-searches");
 
 let locate = {};
-
+// day.js for date handling and parsing Unix timestamps from API
 weatherDisplay.todayDateEl.textContent = dayjs().format("dddd, MMMM DD, YYYY");
 
 function getTodayWeather() {
+  // this API accepts city name queries
   let apiUrl =
     "https://api.openweathermap.org/data/2.5/weather?q=" +
     searchTerm +
@@ -24,6 +25,7 @@ function getTodayWeather() {
 
   fetch(apiUrl).then(function (response) {
     if (response.ok) {
+      console.log(response);
       response
         .json()
         .then(function (data) {
@@ -35,7 +37,7 @@ function getTodayWeather() {
             icon: data.weather[0].icon,
             desc: data.weather[0].description,
           };
-
+          // second and third APIs do not accept city name queries; lat and lon are required, so these are stored here
           locate.lon = data.coord.lon;
           locate.lat = data.coord.lat;
 
@@ -48,14 +50,14 @@ function getTodayWeather() {
           weatherDisplay.tempTodayEl.textContent = weatherToday.temp;
           weatherDisplay.humidityTodayEl.textContent = weatherToday.humidity;
           weatherDisplay.windTodayEl.textContent = weatherToday.wind;
-
+          // note lon and lat values
           let apiUv =
-            "http://api.openweathermap.org/data/2.5/uvi?lat=" +
+            "https://api.openweathermap.org/data/2.5/uvi?lat=" +
             locate.lat +
             "&lon=" +
             locate.lon +
             "&appid=db286021ea7c4b451e838035ab9b35d0";
-
+          // this second API call is dependent on lon and lat data from first response, hence the chain
           return fetch(apiUv);
         })
         .then(function (response) {
@@ -80,7 +82,6 @@ function getTodayWeather() {
                 break;
             }
           });
-          console.log(locate.lat, locate.lon);
           let forecastUrl =
             "https://api.openweathermap.org/data/2.5/onecall?lat=" +
             locate.lat +
@@ -92,13 +93,20 @@ function getTodayWeather() {
         })
         .then(getForecast);
     } else if (response.statusText === "Not Found") {
+      // for misspelled, unknown city names, etc.
       weatherDisplay.cityNameEl.textContent =
         "City name not found. Please try again.";
       weatherDisplay.tempTodayEl.textContent = "";
       weatherDisplay.humidityTodayEl.textContent = "";
       weatherDisplay.windTodayEl.textContent = "";
     } else {
-      console.log(response.statusText);
+      // for all other errors
+      weatherDisplay.cityNameEl.textContent =
+        "Unable to obtain weather data. (Error code" +
+        response.status +
+        ", " +
+        response.statusText +
+        ")";
     }
   });
 }
@@ -106,13 +114,15 @@ function getTodayWeather() {
 function getForecast(response) {
   if (response.ok) {
     response.json().then(function (data) {
+      // i starts at 1 because forecast API returns an array where index 0 is data for current day, while this forecast starts the day after the current day
+      // This for-loop performs 15 querySelector operations and 15 textContent reassignments. I could have assigned all 15 elements to an array or object, but that would have given me a lengthy list in the code without much benefit.
       for (let i = 1; i < 6; i++) {
         document.querySelector("#date-" + i).innerHTML =
           dayjs.unix(data.daily[i].dt).format("dd, MMM DD") +
           "<img src='https://openweathermap.org/img/wn/" +
           data.daily[i].weather[0].icon +
           "@2x.png' alt='' />";
-
+        // index in API response array corresponds with its intended element's id
         document.querySelector("#temp-" + i + " span").textContent =
           data.daily[i].temp.day;
 
@@ -137,7 +147,7 @@ function renderPreviousSearch() {
 
 function setPreviousSearch() {
   previousSearches.unshift(searchTerm);
-
+  // limits previous search list to 10 items
   while (previousSearches.length > 10) {
     previousSearches.splice(10, 1);
   }
@@ -159,13 +169,15 @@ function searchHandler(event) {
 function previousSearchHandler(event) {
   event.preventDefault();
   searchBarEl.value = event.target.textContent;
+  // searchTerm is passed to API request then the fetch chain is fired
   searchTerm = event.target.textContent;
   getTodayWeather();
   setPreviousSearch();
 }
-
+// prevents empty localStorage from causing an error and breaking the page
 if (JSON.parse(localStorage.getItem("previous"))) {
   renderPreviousSearch();
 }
+
 document.querySelector("#find").addEventListener("submit", searchHandler);
 previousContainerEl.addEventListener("click", previousSearchHandler);
